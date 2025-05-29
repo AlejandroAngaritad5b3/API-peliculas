@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 
 class MovieBase(BaseModel):
     film: str
@@ -8,7 +9,14 @@ class MovieBase(BaseModel):
     year: int
 
 class MovieCreate(MovieBase):
-    id: int 
+    id: int
+
+class MovieUpdate(BaseModel):
+    film: Optional[str] = None
+    genre: Optional[str] = None
+    studio: Optional[str] = None
+    score: Optional[int] = None
+    year: Optional[int] = None
 
 class Movie(MovieBase):
     id: int

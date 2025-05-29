@@ -26,8 +26,25 @@ def create_movie(db: Session, movie: schemas.MovieCreate):
     db.add(db_movie)
     db.commit()
     db.refresh(db_movie)
-
     return db_movie
+
+def update_movie(db: Session, movie_id: int, movie_update: schemas.MovieUpdate):
+    db_movie = db.query(models.Movie).filter(models.Movie.id == movie_id).first()
+    if db_movie:
+        for field, value in movie_update.dict(exclude_unset=True).items():
+            setattr(db_movie, field, value)
+        db.add(db_movie)
+        db.commit()
+        db.refresh(db_movie)
+    return db_movie
+
+def delete_movie(db: Session, movie_id: int):
+    db_movie = db.query(models.Movie).filter(models.Movie.id == movie_id).first()
+    if db_movie:
+        db.delete(db_movie)
+        db.commit()
+        return True
+    return False
 
 def load_movies_from_csv(db: Session, csv_file_path: str = "data/movies.csv"):
     if not os.path.exists(csv_file_path):

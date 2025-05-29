@@ -115,3 +115,44 @@ def test_add_existing_movie():
     response = client.post("/movie", json=existing_movie_data)
     assert response.status_code == 400
     assert response.json() == {"detail": "La película con este ID ya existe"}
+
+
+def test_update_movie():
+    update_data = {
+        "film": "Zack and Miri 2: Electric Boogaloo",
+        "score": 85
+    }
+    response = client.patch("/movie/1", json=update_data)
+    assert response.status_code == 200
+    updated_movie = response.json()
+    assert updated_movie["id"] == 1
+    assert updated_movie["film"] == "Zack and Miri 2: Electric Boogaloo"
+    assert updated_movie["score"] == 85
+    assert updated_movie["genre"] == "Romance" 
+    assert updated_movie["studio"] == "The Weinstein Company"
+
+    get_response = client.get("/movie?id=1")
+    assert get_response.status_code == 200
+    assert get_response.json()["film"] == "Zack and Miri 2: Electric Boogaloo"
+    assert get_response.json()["score"] == 85
+
+def test_update_nonexistent_movie():
+    update_data = {"film": "Non Existent", "score": 100}
+    response = client.patch("/movie/999", json=update_data)
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Película no encontrada"}
+
+def test_delete_movie():
+    response = client.get("/movie?id=1")
+    assert response.status_code == 200
+
+    delete_response = client.delete("/movie/1")
+    assert delete_response.status_code == 204
+
+    get_response = client.get("/movie?id=1")
+    assert get_response.status_code == 404
+
+def test_delete_nonexistent_movie():
+    response = client.delete("/movie/999")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Película no encontrada"}
